@@ -1,29 +1,36 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_gravity="bottom"
-    android:background="#66000000">
+    android:background="#00000000">
 
-    <EditText
-        android:id="@+id/textArea"
+    <LinearLayout
+        android:id="@+id/ll_bottom_input"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#fff"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:imeOptions="actionDone"
-        android:paddingLeft="10dp"
-        android:paddingRight="60dp"
-        android:text="测试文字"
-        android:textColor="#000" />
+        android:orientation="horizontal" >
 
-    <Button
-        android:id="@+id/btn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:background="#e5e5e5"
-        android:text="发送" />
+        <EditText
+            android:id="@+id/textArea"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#fff"
+            android:maxLines="4"
+            android:padding="10dp"
+            android:text=""
+            android:textColor="#000" />
+
+        <Button
+            android:id="@+id/btn"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:background="#00BFFF"
+            android:text="发送"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
+
+    </LinearLayout>
 </RelativeLayout>

@@ -1,12 +1,17 @@
 package com.gg.unity_exchange;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,36 +25,29 @@ public class SDKActivity extends Activity {
 
 	private Toast toast;
 	private Activity activity;
+	private Button btn;
+	private EditText editText;
+	private String text = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.android_sdk);
-
 		activity = this;
-		String text = getIntent().getStringExtra("text");
-		final EditText editText = (EditText) findViewById(R.id.textArea);
-		editText.setText(text);
-		editText.setSelection(text.length());
-//		editText.setFocusableInTouchMode(true);
-//		editText.requestFocus();
-//		editText.setCursorVisible(true);
-//		editText.setImeOptions(EditorInfo.IME_ACTION_SEND);
-		//点击了软键盘的完成
-		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					toast("点击了键盘完成按钮：" + editText.getText().toString());
-					SendData(0, editText.getText().toString());
-					finish();
-				}
-				return false;
-			}
-		});
+		try {
+			text = getIntent().getStringExtra("text");
+		} catch (Exception e) {
+			text = "";
+		}
 
-		Button btn = (Button) findViewById(R.id.btn);
+		editText = (EditText) findViewById(R.id.textArea);
+		if (!TextUtils.isEmpty(text)) {
+			editText.setText(text);
+			editText.setSelection(text.length());
+		}
+
+		btn = (Button) findViewById(R.id.btn);
 		btn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -57,27 +55,59 @@ public class SDKActivity extends Activity {
 				if (editText.getText().toString().length() == 0) {
 					return;
 				}
-				SendData(0, editText.getText().toString());
+				SendData(1, editText.getText().toString());
 				finish();
 			}
 		});
+
+		findViewById(R.id.rl_root).setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (v instanceof RelativeLayout) {
+					// 关闭键盘
+					InputMethodManager imm = (InputMethodManager) activity
+							.getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+					return true;
+				}
+				return false;
+			}
+		});
+
+//		// 点击空白处 关闭键盘
+//		findViewById(R.id.tv_dismiss).setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				// 关闭键盘
+//				InputMethodManager imm = (InputMethodManager) activity
+//						.getSystemService(Context.INPUT_METHOD_SERVICE);
+//				imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+//			}
+//		});
 	}
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
+		if (editText.getText().length() > 0) {
+			SendData(0, editText.getText().toString());
+		}
 		finish();
 	}
 
 	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_bottom_out);
+	public void finish() {
+		super.finish();
+		this.overridePendingTransition(0, R.anim.activity_close);
+
 	}
 
 	// 向unity返回数据
-	void SendData(int code, String info) {
-		UnityPlayer.UnitySendMessage("Plugins", "OnCustomInputAction", info);
+	void SendData(int code, String text) {
+		if (code == 1) {
+			UnityPlayer.UnitySendMessage("Plugins", "OnCustomInputAction", text);
+		} else {
+			UnityPlayer.UnitySendMessage("Plugins", "OnCustomInputActionBack", text);
+		}
 	}
 
 	private void toast(final String msg) {

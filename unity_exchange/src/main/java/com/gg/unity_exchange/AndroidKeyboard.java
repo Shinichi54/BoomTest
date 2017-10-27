@@ -40,7 +40,7 @@ public class AndroidKeyboard {
 				intent.putExtra("text", text);
 				intent.setClassName(activity, "com.gg.unity_exchange.SDKActivity");
 				activity.startActivity(intent);
-				activity.overridePendingTransition(R.anim.slide_bottom_in, R.anim.slide_bottom_out);
+				activity.overridePendingTransition(R.anim.activity_open, 0);
 			}
 		});
 	}
